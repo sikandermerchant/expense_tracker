@@ -1,6 +1,6 @@
-const balance = document.getElementById("balance");
-const income = document.getElementById("money-plus");
-const expense = document.getElementById("money-minus");
+const balanceUI = document.getElementById("balance");
+const incomeUI = document.getElementById("money-plus");
+const expenseUI = document.getElementById("money-minus");
 const text = document.getElementById("text");
 const amount = document.getElementById("amount");
 const form = document.getElementById("form");
@@ -21,13 +21,23 @@ const dummyTransactions = [
   },
   {
     id: 3,
+    text: "Project Work",
+    amount: 300,
+  },
+  {
+    id: 4,
     text: "Book",
     amount: -10,
   },
   {
-    id: 4,
+    id: 5,
     text: "Camera",
     amount: -150,
+  },
+  {
+    id: 6,
+    text: "Rent",
+    amount: -800,
   },
 ];
 
@@ -52,10 +62,38 @@ function addTransactionDOM(transaction) {
   list.appendChild(item);
 }
 
+//Update balance, income and expense function
+function updateValues() {
+  //Create an array with just the amounts of each transaction using map method
+  const amounts = transactions.map((transaction) => transaction.amount);
+
+  ///Calculate totals using reduce method
+  const reducer = (accumulator, currentValue) => accumulator + currentValue;
+  const total = amounts.reduce(reducer, 0).toFixed(2);
+
+  //Calculate income
+  const income = amounts
+    .filter((item) => item > 0)
+    .reduce(reducer, 0)
+    .toFixed(2);
+
+  //Calculate expense
+  const expense =
+    amounts
+      .filter((item) => item < 0)
+      .reduce(reducer, 0)
+      .toFixed(2) * -1;
+
+  //Display amount income and expense on the DOM
+  balanceUI.innerText = `£${total}`;
+  incomeUI.innerText = `£${income}`;
+  expenseUI.innerText = `£${expense}`;
+}
 //Init app
 function init() {
   list.innerHTML = "";
   transactions.forEach(addTransactionDOM);
+  updateValues();
 }
 
 init();
