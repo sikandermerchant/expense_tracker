@@ -42,6 +42,30 @@ const dummyTransactions = [
 ];
 
 let transactions = dummyTransactions;
+
+//Add transaction function
+function addTransaction(e) {
+  if (text.value.trim() === "" || amount.value.trim() === "") {
+    alert("Please enter transaction text and amount");
+  } else {
+    const transaction = {
+      id: generateID(),
+      text: text.value,
+      amount: +amount.value,
+    };
+    transactions.push(transaction);
+    addTransactionDOM(transaction);
+    updateValues();
+    text.value = "";
+    amount.value = "";
+  }
+  e.preventDefault();
+}
+
+//Generate random id
+function generateID() {
+  return Math.floor(Math.random() * 1000000);
+}
 //Add transaction to DOM List
 function addTransactionDOM(transaction) {
   ///Get the sign
@@ -56,7 +80,9 @@ function addTransactionDOM(transaction) {
   item.innerHTML = `
     ${transaction.text} <span>${sign}${Math.abs(
     transaction.amount
-  )}</span><button class="delete-btn">x</button>
+  )}</span><button class="delete-btn" onclick="removeTransaction(${
+    transaction.id
+  })">x</button>
   `;
   ///we are using Math.abs as we want just the absolute number without the + or - sign coming from the amount. The sign varaible will provide the necessary sign and related colour
   list.appendChild(item);
@@ -66,7 +92,6 @@ function addTransactionDOM(transaction) {
 function updateValues() {
   //Create an array with just the amounts of each transaction using map method
   const amounts = transactions.map((transaction) => transaction.amount);
-
   ///Calculate totals using reduce method
   const reducer = (accumulator, currentValue) => accumulator + currentValue;
   const total = amounts.reduce(reducer, 0).toFixed(2);
@@ -89,6 +114,13 @@ function updateValues() {
   incomeUI.innerText = `£${income}`;
   expenseUI.innerText = `£${expense}`;
 }
+
+//Remove transaction by id
+function removeTransaction(id) {
+  transactions = transactions.filter((transaction) => transaction.id != id);
+  init();
+}
+
 //Init app
 function init() {
   list.innerHTML = "";
@@ -97,3 +129,6 @@ function init() {
 }
 
 init();
+
+//Event Listener for Adding Transaction
+form.addEventListener("submit", addTransaction);
