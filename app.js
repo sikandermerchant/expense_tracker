@@ -5,6 +5,8 @@ const text = document.getElementById("text");
 const amount = document.getElementById("amount");
 const form = document.getElementById("form");
 const list = document.getElementById("list");
+const addTransactionBtn = document.getElementById('addTransactionBtn');
+const updateTransactionBtn = document.getElementById('updateTransactionBtn');
 
 ///Ultimately we will store the transactions into local storage but for development purpose lets create an array with dummy transactions as below:
 
@@ -85,11 +87,15 @@ function addTransactionDOM(transaction) {
   item.innerHTML = `
     ${transaction.text} <span>${sign}${Math.abs(
     transaction.amount
-  )}</span><button class="delete-btn" onclick="removeTransaction(${
+  )}</span>
+  <button class="delete-btn" onclick="removeTransaction(${
     transaction.id
   })">x</button>
+  <button class="edit-btn" onclick="editTransaction(${
+    transaction.id
+  })">-</button>
   `;
-  ///we are using Math.abs as we want just the absolute number without the + or - sign coming from the amount. The sign varaible will provide the necessary sign and related colour
+  ///we are using Math.abs as we want just the absolute number without the + or - sign coming from the amount. The sign variable will provide the necessary sign and related colour
   list.appendChild(item);
 }
 
@@ -110,9 +116,9 @@ function updateValues() {
   //Calculate expense
   const expense =
     amounts
-      .filter((item) => item < 0)
-      .reduce(reducer, 0)
-      .toFixed(2) * -1;
+    .filter((item) => item < 0)
+    .reduce(reducer, 0)
+    .toFixed(2) * -1;
 
   //Display amount income and expense on the DOM
   balanceUI.innerText = `£${total}`;
@@ -125,6 +131,30 @@ function removeTransaction(id) {
   transactions = transactions.filter((transaction) => transaction.id != id);
   updateLocalStorage();
   init();
+}
+
+//Edit Transactions
+function editTransaction(id) {
+  const transactionToEdit = transactions.filter((transaction) => transaction.id === id);
+  text.value = transactionToEdit[0].text;
+  amount.value = transactionToEdit[0].amount;
+  addTransactionBtn.style.display = 'none';
+  updateTransactionBtn.style.visibility = 'visible';
+  updateTransactionBtn.addEventListener('click', () => {
+    const editedTransaction = {
+      id: transactionToEdit[0].id,
+      text: text.value,
+      amount: +amount.value,
+    };
+    transactions = transactions.filter(transaction => transaction.id !== editedTransaction.id);
+    transactions.push(editedTransaction);
+    updateLocalStorage();
+    init();
+    text.value = '';
+    amount.value = '';
+    addTransactionBtn.style.display = 'block';
+    updateTransactionBtn.style.visibility = 'invisible';
+  })
 }
 
 //Update local storage transactions
